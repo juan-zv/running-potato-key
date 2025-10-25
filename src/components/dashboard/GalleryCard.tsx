@@ -163,7 +163,7 @@ export function GalleryCard() {
                 {/* Category Selection */}
                 <div className="space-y-2 max-w-[200px] ml-2.5">
                   <Label htmlFor="category">Category</Label>
-                  <Select value={category} onValueChange={setCategory} className="max-w-[200px]">
+                  <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger id="category">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
