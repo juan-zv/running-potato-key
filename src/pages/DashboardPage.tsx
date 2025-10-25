@@ -33,8 +33,8 @@ export function DashboardPage() {
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
   
   // Get user's group_id from user metadata or profile
-  const [userGroupId, setUserGroupId] = useState<number | null>(null)
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+  const [userGroupId, setUserGroupId] = useState<string | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
   // Fetch group data with auto-refresh
   const { 

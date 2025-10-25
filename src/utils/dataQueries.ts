@@ -8,7 +8,7 @@ import type { User, Task, Image } from "@/components/db/schema"
 
 interface TaskWithAssignees extends Task {
   assignees: User[]
-  assigned_task_ids?: number[]
+  assigned_task_ids?: string[]
 }
 
 interface ImageWithCreator extends Image {
@@ -26,7 +26,7 @@ interface GroupDataStructure {
 /**
  * Query: Get all tasks assigned to a specific user
  */
-export function getTasksByUser(data: GroupDataStructure, userId: number): TaskWithAssignees[] {
+export function getTasksByUser(data: GroupDataStructure, userId: string): TaskWithAssignees[] {
   return data.tasks.filter(task => 
     task.assigned_task_ids?.includes(userId)
   )
@@ -35,7 +35,7 @@ export function getTasksByUser(data: GroupDataStructure, userId: number): TaskWi
 /**
  * Query: Get all images created by a specific user
  */
-export function getImagesByCreator(data: GroupDataStructure, userId: number): ImageWithCreator[] {
+export function getImagesByCreator(data: GroupDataStructure, userId: string): ImageWithCreator[] {
   return data.images.filter(image => 
     image.user_id === userId
   )
@@ -110,8 +110,8 @@ export function groupTasksByStatus(data: GroupDataStructure) {
 /**
  * Transform: Group tasks by assignee
  */
-export function groupTasksByAssignee(data: GroupDataStructure): Record<number, TaskWithAssignees[]> {
-  const grouped: Record<number, TaskWithAssignees[]> = {}
+export function groupTasksByAssignee(data: GroupDataStructure): Record<string, TaskWithAssignees[]> {
+  const grouped: Record<string, TaskWithAssignees[]> = {}
   
   data.tasks.forEach(task => {
     task.assignees.forEach(assignee => {
@@ -144,8 +144,8 @@ export function groupImagesByCategory(data: GroupDataStructure): Record<string, 
 /**
  * Transform: Group images by creator
  */
-export function groupImagesByCreator(data: GroupDataStructure): Record<number, ImageWithCreator[]> {
-  const grouped: Record<number, ImageWithCreator[]> = {}
+export function groupImagesByCreator(data: GroupDataStructure): Record<string, ImageWithCreator[]> {
+  const grouped: Record<string, ImageWithCreator[]> = {}
   
   data.images.forEach(image => {
     if (!grouped[image.user_id]) {
@@ -160,7 +160,7 @@ export function groupImagesByCreator(data: GroupDataStructure): Record<number, I
 /**
  * Statistics: Get user task statistics
  */
-export function getUserTaskStats(data: GroupDataStructure, userId: number) {
+export function getUserTaskStats(data: GroupDataStructure, userId: string) {
   const userTasks = getTasksByUser(data, userId)
   const completed = userTasks.filter(t => t.completed).length
   const incomplete = userTasks.filter(t => !t.completed).length

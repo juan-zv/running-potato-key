@@ -16,7 +16,7 @@ import type { User, Group, Image, Task, AssignedTask } from "@/components/db/sch
 // Enhanced types with relationships
 interface TaskWithAssignees extends Task {
   assignees: User[]
-  assigned_task_ids?: number[]  // Track which users are assigned
+  assigned_task_ids?: string[]  // Track which users are assigned
 }
 
 interface ImageWithCreator extends Image {
@@ -44,14 +44,14 @@ interface UseGroupDataReturn {
   loading: boolean
   error: string | null
   refetch: () => Promise<void>
-  updateTask: (taskId: number, updates: Partial<Task>) => Promise<void>
+  updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
 }
 
 const CACHE_KEY = "group_data_cache"
 const CACHE_TIMESTAMP_KEY = "group_data_timestamp"
 const REFRESH_INTERVAL = 5 * 60 * 1000 // 5 minutes
 
-export function useGroupData(groupId: number | null): UseGroupDataReturn {
+export function useGroupData(groupId: string | null): UseGroupDataReturn {
   const [data, setData] = useState<GroupDataStructure>({
     group: null,
     users: [],
@@ -126,7 +126,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
       console.log("📊 Fetched users for group", groupId, ":", usersData)
 
       // Create a map of user_id -> User for quick lookups
-      const userMap = new Map<number, User>()
+      const userMap = new Map<string, User>()
       usersData?.forEach(user => userMap.set(user.id, user))
 
       // 3. Fetch images with creator relationship
@@ -171,7 +171,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
       }
 
       // Create a map of task_id -> assigned user_ids
-      const taskAssignmentsMap = new Map<number, number[]>()
+      const taskAssignmentsMap = new Map<string, string[]>()
       assignedTasksData.forEach(at => {
         const existing = taskAssignmentsMap.get(at.task_id) || []
         taskAssignmentsMap.set(at.task_id, [...existing, at.user_id])
@@ -229,7 +229,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
   }, [groupId, fetchGroupData, saveToCache])
 
   // Update task (for marking as completed)
-  const updateTask = useCallback(async (taskId: number, updates: Partial<Task>) => {
+  const updateTask = useCallback(async (taskId: string, updates: Partial<Task>) => {
     try {
       const { error: updateError } = await supabase
         .from("Task")

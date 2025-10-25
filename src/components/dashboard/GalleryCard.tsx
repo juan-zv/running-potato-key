@@ -35,8 +35,8 @@ interface GalleryCardProps {
   images: Image[]
   loading: boolean
   onImageUploaded: () => void
-  groupId: number | null
-  userId: number | null
+  groupId: string | null
+  userId: string | null
 }
 
 export function GalleryCard({ images, loading, onImageUploaded, groupId, userId }: GalleryCardProps) {
