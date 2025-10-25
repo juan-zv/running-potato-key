@@ -78,9 +78,9 @@ export function CalendarEventsCard() {
 
         {events.length > 0 && (
           <div className="space-y-3 mt-4">
-            <h3 className="text-sm font-semibold">Upcoming Events:</h3>
-            <ScrollArea className="max-h-[600px] pr-4">
-              <div className="space-y-3">
+            <h3 className="text-sm font-semibold mb-4">Upcoming Events:</h3>
+            <ScrollArea className="h-[600px] rounded-md border">
+              <div className="p-4 space-y-3">
                 {events.map((event) => (
                   <div
                     key={event.id}
