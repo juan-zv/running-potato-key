@@ -32,11 +32,10 @@ type Group = {
 type Image = {
     id: number
     url: string
+    group_id: number  // Foreign key to Group
+    user_id: number  // Foreign key to User (creator)
     title: string
     category: string
-    group_id: number  // Foreign key to Group
-    created_by: number  // Foreign key to User
-    created_at?: Date  // Optional: when the image was uploaded
 }
 
 type Task = {
