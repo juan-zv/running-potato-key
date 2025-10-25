@@ -1,35 +1,55 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchUpcomingCalendarEvents, type CalendarEvent } from "@/utils/calendar"
 import { toast } from "sonner"
-import { Calendar, Clock, MapPin, Loader2 } from "lucide-react"
+import { Calendar, Clock, MapPin, Loader2, RefreshCw } from "lucide-react"
 
-export function CalendarEventsCard() {
+interface CalendarEventsCardProps {
+  onEventsLoaded?: (events: CalendarEvent[]) => void
+}
+
+export function CalendarEventsCard({ onEventsLoaded }: CalendarEventsCardProps) {
   const [events, setEvents] = useState<CalendarEvent[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const handleFetchEvents = async () => {
     try {
       setLoading(true)
+      setError(null)
       
       // Fetch next 10 events
       const upcomingEvents = await fetchUpcomingCalendarEvents(10)
       setEvents(upcomingEvents)
       
-      toast.success("Calendar events loaded", {
-        description: `Found ${upcomingEvents.length} upcoming events`,
-      })
-    } catch (error) {
+      // Pass events to parent component
+      if (onEventsLoaded) {
+        onEventsLoaded(upcomingEvents)
+      }
+      
+      if (upcomingEvents.length > 0) {
+        toast.success("Calendar events loaded", {
+          description: `Found ${upcomingEvents.length} upcoming events`,
+        })
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error"
+      setError(errorMessage)
       toast.error("Failed to load calendar events", {
-        description: error instanceof Error ? error.message : "Unknown error",
+        description: errorMessage,
       })
-      console.error(error)
+      console.error(err)
     } finally {
       setLoading(false)
     }
   }
+
+  // Auto-fetch on component mount
+  useEffect(() => {
+    handleFetchEvents()
+  }, []) // Empty dependency array means this runs once on mount
 
   const formatEventDate = (event: CalendarEvent) => {
     const startDate = event.start.dateTime || event.start.date
@@ -61,22 +81,34 @@ export function CalendarEventsCard() {
         <Button
           onClick={handleFetchEvents}
           disabled={loading}
+          variant="outline"
+          size="sm"
           className="w-fit"
         >
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading events...
+              Refreshing...
             </>
           ) : (
             <>
-              <Calendar className="mr-2 h-4 w-4" />
-              Fetch Calendar Events
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh Events
             </>
           )}
         </Button>
 
-        {events.length > 0 && (
+        {error && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3">
+            <p className="text-sm text-destructive">{error}</p>
+          </div>
+        )}
+
+        {loading && events.length === 0 ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : events.length > 0 ? (
           <div className="space-y-3 mt-4">
             <h3 className="text-sm font-semibold mb-4">Upcoming Events:</h3>
             <ScrollArea className="h-[400px] rounded-md border">
@@ -125,13 +157,11 @@ export function CalendarEventsCard() {
               </div>
             </ScrollArea>
           </div>
-        )}
-
-        {!loading && events.length === 0 && (
+        ) : (
           <div className="text-center py-8 text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No events loaded yet</p>
-            <p className="text-sm">Click the button above to fetch your calendar events</p>
+            <p>No upcoming events</p>
+            <p className="text-sm">Your calendar is clear</p>
           </div>
         )}
       </CardContent>

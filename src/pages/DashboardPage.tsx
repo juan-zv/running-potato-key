@@ -24,11 +24,13 @@ import supabase from "@/utils/supabase"
 import { toast } from "sonner"
 import { LogOut, Settings, User as UserIcon, Bell, HelpCircle, GraduationCap, RefreshCw } from "lucide-react"
 import { useState, useEffect } from "react"
+import type { CalendarEvent } from "@/utils/calendar"
 
 export function DashboardPage() {
   const { user } = useAuth()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [studyModeActive, setStudyModeActive] = useState(false)
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
   
   // Get user's group_id from user metadata or profile
   const [userGroupId, setUserGroupId] = useState<number | null>(null)
@@ -45,6 +47,11 @@ export function DashboardPage() {
     refetch, 
     updateTask 
   } = useGroupData(userGroupId)
+
+  // Callback to receive calendar events from CalendarEventsCard
+  const handleCalendarEventsLoaded = (events: CalendarEvent[]) => {
+    setCalendarEvents(events)
+  }
 
   // Load user's group_id and database user_id on mount
   useEffect(() => {
@@ -265,7 +272,10 @@ export function DashboardPage() {
             </div>
 
             {/* AI Summary - Full Width */}
-            <AISummaryCard />
+            <AISummaryCard 
+              tasks={tasks} 
+              calendarEvents={calendarEvents}
+            />
 
             {/* Study Mode Card */}
             <Card className="w-full border-primary/30 bg-linear-to-r from-primary/10 to-purple-500/10">
@@ -298,7 +308,7 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Calendar Events - Spans 2 columns on large screens */}
               <div className="lg:col-span-2">
-                <CalendarEventsCard />
+                <CalendarEventsCard onEventsLoaded={handleCalendarEventsLoaded} />
               </div>
 
               {/* Tasks - 1 column */}
