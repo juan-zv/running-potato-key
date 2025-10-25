@@ -8,11 +8,11 @@ import { toast } from "sonner"
 interface TasksCardProps {
   tasks: Task[]
   loading: boolean
-  onTaskUpdate: (taskId: number, updates: Partial<Task>) => Promise<void>
+  onTaskUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>
 }
 
 export function TasksCard({ tasks, loading, onTaskUpdate }: TasksCardProps) {
-  const handleToggleComplete = async (taskId: number, currentStatus: boolean) => {
+  const handleToggleComplete = async (taskId: string, currentStatus: boolean) => {
     try {
       await onTaskUpdate(taskId, { completed: !currentStatus })
       toast.success(

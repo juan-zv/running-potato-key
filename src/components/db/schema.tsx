@@ -9,7 +9,7 @@
  */
 
 type User = {
-    id: number
+    id: string  // UUID
     dob: Date
     name: string
     email: string
@@ -18,41 +18,41 @@ type User = {
     allergies: string
     special_needs: string
     pets: string
-    group_id: number | null  // Foreign key to Group (nullable if user has no group yet)
+    group_id: string | null  // Foreign key to Group (nullable if user has no group yet)
     phone: string
     profile_picture: number | null  // Foreign key to Image (nullable if no profile picture)
 }
 
 type Group = {
-    id: number
+    id: string  // UUID
     created_at: Date
     building: string
     apt_num: string
 }
 
 type Image = {
-    id: number
+    id: string  // UUID
     url: string
-    group_id: number  // Foreign key to Group
-    user_id: number  // Foreign key to User (creator)
+    group_id: string  // Foreign key to Group
+    user_id: string  // Foreign key to User (creator)
     title: string
     category: string
 }
 
 type Task = {
-    id: number
+    id: string  // UUID
     name: string
     description: string
-    assigned_to: number | null  // Foreign key to User (nullable if unassigned)
+    assigned_to: string | null  // Foreign key to User (nullable if unassigned)
     completed: boolean
     due_date: Date
     created_at?: Date  // Optional: when the task was created
-    group_id?: number  // Optional: if tasks are group-specific
+    group_id?: string  // Optional: if tasks are group-specific
 }
 
 type AssignedTask = {
-    task_id: number  // Foreign key to Task
-    user_id: number  // Foreign key to User
+    task_id: string  // Foreign key to Task
+    user_id: string  // Foreign key to User
     assigned_at?: Date  // Optional: when the assignment was made
 }
 

@@ -2,46 +2,68 @@
  * Custom hook for managing group data with caching and auto-refresh
  * 
  * Features:
- * - Fetches all group-related data on mount
+ * - Fetches all group-related data with relationships in one structured JSON format
  * - Caches data in localStorage
  * - Auto-refreshes every 5 minutes
  * - Provides loading and error states
+ * - Handles relationships: Group→Users, Task→Assignees, Image→Creator
  */
 
 import { useState, useEffect, useCallback } from "react"
 import supabase from "@/utils/supabase"
-import type { User, Group, Image, Task } from "@/components/db/schema"
+import type { User, Group, Image, Task, AssignedTask } from "@/components/db/schema"
 
-interface GroupData {
-  group: Group | null
-  users: User[]
-  images: Image[]
-  tasks: Task[]
+// Enhanced types with relationships
+interface TaskWithAssignees extends Task {
+  assignees: User[]
+  assigned_task_ids?: string[]  // Track which users are assigned
 }
 
-interface UseGroupDataReturn extends GroupData {
+interface ImageWithCreator extends Image {
+  creator: User | null
+}
+
+interface GroupDataStructure {
+  group: Group | null
+  users: User[]
+  images: ImageWithCreator[]
+  tasks: TaskWithAssignees[]
+  assignedTasks: AssignedTask[]  // Raw junction table data
+}
+
+interface UseGroupDataReturn {
+  // Structured data with relationships
+  group: Group | null
+  users: User[]
+  images: ImageWithCreator[]
+  tasks: TaskWithAssignees[]
+  assignedTasks: AssignedTask[]
+  // Full JSON structure
+  fullData: GroupDataStructure
+  // Utility states
   loading: boolean
   error: string | null
   refetch: () => Promise<void>
-  updateTask: (taskId: number, updates: Partial<Task>) => Promise<void>
+  updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
 }
 
 const CACHE_KEY = "group_data_cache"
 const CACHE_TIMESTAMP_KEY = "group_data_timestamp"
 const REFRESH_INTERVAL = 5 * 60 * 1000 // 5 minutes
 
-export function useGroupData(groupId: number | null): UseGroupDataReturn {
-  const [data, setData] = useState<GroupData>({
+export function useGroupData(groupId: string | null): UseGroupDataReturn {
+  const [data, setData] = useState<GroupDataStructure>({
     group: null,
     users: [],
     images: [],
     tasks: [],
+    assignedTasks: [],
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   // Load data from cache
-  const loadFromCache = useCallback((): GroupData | null => {
+  const loadFromCache = useCallback((): GroupDataStructure | null => {
     try {
       const cached = localStorage.getItem(CACHE_KEY)
       const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
@@ -61,7 +83,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
   }, [])
 
   // Save data to cache
-  const saveToCache = useCallback((groupData: GroupData) => {
+  const saveToCache = useCallback((groupData: GroupDataStructure) => {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(groupData))
       localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
@@ -70,19 +92,20 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
     }
   }, [])
 
-  // Fetch all group data from Supabase
-  const fetchGroupData = useCallback(async (): Promise<GroupData> => {
+  // Fetch all group data from Supabase with relationships
+  const fetchGroupData = useCallback(async (): Promise<GroupDataStructure> => {
     if (!groupId) {
       return {
         group: null,
         users: [],
         images: [],
         tasks: [],
+        assignedTasks: [],
       }
     }
 
     try {
-      // Fetch group info
+      // 1. Fetch group info
       const { data: groupData, error: groupError } = await supabase
         .from("Group")
         .select("*")
@@ -91,7 +114,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       if (groupError) throw groupError
 
-      // Fetch users in this group
+      // 2. Fetch all users in this group
       const { data: usersData, error: usersError } = await supabase
         .from("User")
         .select("*")
@@ -100,7 +123,13 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       if (usersError) throw usersError
 
-      // Fetch images for this group
+      console.log("📊 Fetched users for group", groupId, ":", usersData)
+
+      // Create a map of user_id -> User for quick lookups
+      const userMap = new Map<string, User>()
+      usersData?.forEach(user => userMap.set(user.id, user))
+
+      // 3. Fetch images with creator relationship
       const { data: imagesData, error: imagesError } = await supabase
         .from("Image")
         .select("*")
@@ -109,7 +138,13 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       if (imagesError) throw imagesError
 
-      // Fetch tasks for this group
+      // Enrich images with creator info
+      const imagesWithCreator: ImageWithCreator[] = (imagesData || []).map(image => ({
+        ...image,
+        creator: userMap.get(image.user_id) || null,
+      }))
+
+      // 4. Fetch tasks for this group
       const { data: tasksData, error: tasksError } = await supabase
         .from("Task")
         .select("*")
@@ -118,11 +153,51 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       if (tasksError) throw tasksError
 
+      // 5. Fetch all assigned_tasks relationships for these tasks
+      const taskIds = tasksData?.map(t => t.id) || []
+      let assignedTasksData: AssignedTask[] = []
+      
+      if (taskIds.length > 0) {
+        const { data: assignedData, error: assignedError } = await supabase
+          .from("assigned_tasks")
+          .select("*")
+          .in("task_id", taskIds)
+
+        if (assignedError) {
+          console.error("Error fetching assigned tasks:", assignedError)
+        } else {
+          assignedTasksData = assignedData || []
+        }
+      }
+
+      // Create a map of task_id -> assigned user_ids
+      const taskAssignmentsMap = new Map<string, string[]>()
+      assignedTasksData.forEach(at => {
+        const existing = taskAssignmentsMap.get(at.task_id) || []
+        taskAssignmentsMap.set(at.task_id, [...existing, at.user_id])
+      })
+
+      // Enrich tasks with assignee info
+      const tasksWithAssignees: TaskWithAssignees[] = (tasksData || []).map(task => {
+        const assignedUserIds = taskAssignmentsMap.get(task.id) || []
+        const assignees = assignedUserIds
+          .map(userId => userMap.get(userId))
+          .filter((user): user is User => user !== undefined)
+
+        return {
+          ...task,
+          assignees,
+          assigned_task_ids: assignedUserIds,
+        }
+      })
+
+      // Return structured data
       return {
         group: groupData,
         users: usersData || [],
-        images: imagesData || [],
-        tasks: tasksData || [],
+        images: imagesWithCreator,
+        tasks: tasksWithAssignees,
+        assignedTasks: assignedTasksData,
       }
     } catch (err) {
       console.error("Error fetching group data:", err)
@@ -154,7 +229,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
   }, [groupId, fetchGroupData, saveToCache])
 
   // Update task (for marking as completed)
-  const updateTask = useCallback(async (taskId: number, updates: Partial<Task>) => {
+  const updateTask = useCallback(async (taskId: string, updates: Partial<Task>) => {
     try {
       const { error: updateError } = await supabase
         .from("Task")
@@ -172,7 +247,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
       }))
 
       // Update cache
-      const updatedData = {
+      const updatedData: GroupDataStructure = {
         ...data,
         tasks: data.tasks.map(task =>
           task.id === taskId ? { ...task, ...updates } : task
@@ -217,6 +292,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
   return {
     ...data,
+    fullData: data,  // Provide the complete structured data
     loading,
     error,
     refetch,

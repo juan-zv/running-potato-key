@@ -35,8 +35,8 @@ interface GalleryCardProps {
   images: Image[]
   loading: boolean
   onImageUploaded: () => void
-  groupId: number | null
-  userId: number | null
+  groupId: string | null
+  userId: string | null
 }
 
 export function GalleryCard({ images, loading, onImageUploaded, groupId, userId }: GalleryCardProps) {
@@ -104,13 +104,13 @@ export function GalleryCard({ images, loading, onImageUploaded, groupId, userId 
 
       // Insert metadata into database
       const { error: dbError } = await supabase
-        .from("images")
+        .from("Image")
         .insert({
           url: urlData.publicUrl,
           title: selectedFile.name.replace(/\.[^/.]+$/, ""), // Remove extension
           category: category,
           group_id: groupId,
-          created_by: userId,
+          user_id: userId,
         })
 
       if (dbError) {

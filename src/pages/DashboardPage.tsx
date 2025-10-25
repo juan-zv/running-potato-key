@@ -33,8 +33,8 @@ export function DashboardPage() {
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
   
   // Get user's group_id from user metadata or profile
-  const [userGroupId, setUserGroupId] = useState<number | null>(null)
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+  const [userGroupId, setUserGroupId] = useState<string | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
   // Fetch group data with auto-refresh
   const { 
@@ -42,11 +42,20 @@ export function DashboardPage() {
     users, 
     images, 
     tasks, 
+    fullData,
     loading, 
     error, 
     refetch, 
     updateTask 
   } = useGroupData(userGroupId)
+
+  // Log the complete structured JSON data for debugging
+  useEffect(() => {
+    if (!loading && fullData) {
+      console.log("📊 Complete Group Data (JSON Structure):", JSON.stringify(fullData, null, 2))
+      console.log("📊 Full Data Object:", fullData)
+    }
+  }, [fullData, loading])
 
   // Callback to receive calendar events from CalendarEventsCard
   const handleCalendarEventsLoaded = (events: CalendarEvent[]) => {
@@ -77,6 +86,7 @@ export function DashboardPage() {
         if (userData) {
           setUserGroupId(userData.group_id)
           setCurrentUserId(userData.id)
+          console.log("📊 Loaded user info - User ID:", userData.id, "Group ID:", userData.group_id)
         }
       } catch (err) {
         console.error("Error loading user info:", err)
