@@ -30,44 +30,11 @@ import supabase from "@/utils/supabase"
 import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
-
-
-interface GalleryImage {
-  id: string
-  url: string
-  title: string
-  category?: string
-}
-
-const mockImages: GalleryImage[] = [
-  {
-    id: "1",
-    url: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=400&h=300&fit=crop",
-    title: "Mountain View",
-    category: "nature",
-  },
-  {
-    id: "2",
-    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
-    title: "Nature Scene",
-    category: "nature",
-  },
-  {
-    id: "3",
-    url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop",
-    title: "Sunset",
-    category: "nature",
-  },
-  {
-    id: "4",
-    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
-    title: "Forest Path",
-    category: "nature",
-  },
-]
+import { mockImages } from "@/utils/mockData"
+import type { Image } from "@/components/db/schema"
 
 export function GalleryCard() {
-  const [images] = useState<GalleryImage[]>(mockImages)
+  const [images] = useState<Image[]>(mockImages)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [category, setCategory] = useState("family")

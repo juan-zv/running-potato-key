@@ -2,21 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Circle, Plus } from "lucide-react"
-
-interface Task {
-  id: string
-  title: string
-  completed: boolean
-  dueDate?: string
-}
-
-const mockTasks: Task[] = [
-  { id: "1", title: "Review project proposal", completed: false, dueDate: "Today" },
-  { id: "2", title: "Update documentation", completed: false, dueDate: "Today" },
-  { id: "3", title: "Team sync meeting prep", completed: true, dueDate: "Yesterday" },
-  { id: "4", title: "Code review for PR #123", completed: false, dueDate: "Tomorrow" },
-  { id: "5", title: "Plan sprint goals", completed: false, dueDate: "This week" },
-]
+import { mockTasks } from "@/utils/mockData"
 
 export function TasksCard() {
   return (
@@ -40,21 +26,26 @@ export function TasksCard() {
               className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent"
             >
               <Checkbox
-                id={task.id}
+                id={`task-${task.id}`}
                 checked={task.completed}
                 className="mt-0.5"
               />
               <div className="flex-1 space-y-1">
                 <label
-                  htmlFor={task.id}
+                  htmlFor={`task-${task.id}`}
                   className={`text-sm font-medium leading-none cursor-pointer ${
                     task.completed ? "line-through text-muted-foreground" : ""
                   }`}
                 >
-                  {task.title}
+                  {task.name}
                 </label>
-                {task.dueDate && (
-                  <p className="text-xs text-muted-foreground">{task.dueDate}</p>
+                {task.description && (
+                  <p className="text-xs text-muted-foreground">{task.description}</p>
+                )}
+                {task.due_date && (
+                  <p className="text-xs text-muted-foreground">
+                    Due: {new Date(task.due_date).toLocaleDateString()}
+                  </p>
                 )}
               </div>
               {task.completed ? (
