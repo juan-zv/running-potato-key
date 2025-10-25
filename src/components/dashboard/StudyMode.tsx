@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import { Play, Pause, RotateCcw, X } from "lucide-react"
 
 interface StudyModeProps {
@@ -107,11 +108,11 @@ export function StudyMode({ onExit }: StudyModeProps) {
         {/* Timer display */}
         <Card className="relative overflow-hidden">
           {/* Progress bar */}
-          <div 
-            className="absolute bottom-0 left-0 h-1 bg-primary transition-all duration-1000 progress-bar"
-            style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
+          <Progress 
+            value={progress} 
+            className="absolute bottom-0 left-0 h-1 rounded-none"
           />
-          
+
           <div className="p-12">
             <div className="text-center">
               <div className="text-9xl font-bold tabular-nums tracking-tight mb-4">
