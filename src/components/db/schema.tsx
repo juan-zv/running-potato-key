@@ -30,10 +30,16 @@ type Image = {
 
 type Task = {
     id: number
+    name: string
     desciription: string
     assigned_to: number
     completed: boolean
     due_date: Date
 }
 
-export type { User, Room, Image, Task }
+type AssignedTask = {
+    task_id: number
+    user_id: number
+}
+
+export type { User, Room, Image, Task, AssignedTask }
