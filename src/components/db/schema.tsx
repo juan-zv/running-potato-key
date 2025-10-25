@@ -1,3 +1,13 @@
+/**
+ * Database Schema Types
+ * 
+ * Relationships:
+ * - Group → Users (one-to-many): One group can have many users
+ * - Group → Images (one-to-many): One group can have many images
+ * - User → Images (one-to-many): One user can create many images
+ * - Task ← → User (many-to-many via AssignedTask): Tasks can be assigned to multiple users
+ */
+
 type User = {
     id: number
     dob: Date
@@ -8,11 +18,11 @@ type User = {
     allergies: string
     special_needs: string
     pets: string
-    room_id: number
+    group_id: number | null  // Foreign key to Group (nullable if user has no group yet)
     phone: string
 }
 
-type Room = {
+type Group = {
     id: number
     created_at: Date
     building: string
@@ -24,22 +34,53 @@ type Image = {
     url: string
     title: string
     category: string
-    room_id: number
-    created_by: number
+    group_id: number  // Foreign key to Group
+    created_by: number  // Foreign key to User
+    created_at?: Date  // Optional: when the image was uploaded
 }
 
 type Task = {
     id: number
     name: string
-    desciription: string
-    assigned_to: number
+    description: string
+    assigned_to: number | null  // Foreign key to User (nullable if unassigned)
     completed: boolean
     due_date: Date
+    created_at?: Date  // Optional: when the task was created
+    group_id?: number  // Optional: if tasks are group-specific
 }
 
 type AssignedTask = {
-    task_id: number
-    user_id: number
+    task_id: number  // Foreign key to Task
+    user_id: number  // Foreign key to User
+    assigned_at?: Date  // Optional: when the assignment was made
 }
 
-export type { User, Room, Image, Task, AssignedTask }
+// Helper types for queries with joined data
+type UserWithGroup = User & {
+    group?: Group
+}
+
+type GroupWithUsers = Group & {
+    users?: User[]
+}
+
+type ImageWithCreator = Image & {
+    creator?: User
+}
+
+type TaskWithAssignees = Task & {
+    assignees?: User[]
+}
+
+export type { 
+    User, 
+    Group, 
+    Image, 
+    Task, 
+    AssignedTask,
+    UserWithGroup,
+    GroupWithUsers,
+    ImageWithCreator,
+    TaskWithAssignees
+}
