@@ -3,8 +3,8 @@ import { Sparkles, Loader2 } from "lucide-react"
 import { GoogleGenAI } from "@google/genai"
 import { useEffect, useState } from "react"
 
-// The client gets the API key from the environment variable `GEMINI_API_KEY`.
-const ai = new GoogleGenAI({})
+// The client gets the API key from the environment variable `VITE_GEMINI_API_KEY`.
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY })
 
 interface SummaryData {
   text: string
