@@ -20,6 +20,7 @@ type User = {
     pets: string
     group_id: string | null  // Foreign key to Group (nullable if user has no group yet)
     phone: string
+    profile_picture: number | null  // Foreign key to Image (nullable if no profile picture)
 }
 
 type Group = {
