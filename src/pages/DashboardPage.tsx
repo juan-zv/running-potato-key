@@ -68,6 +68,23 @@ export function DashboardPage() {
       if (!user) return
 
       try {
+        // ============================================
+        // USING MOCK DATA - Database call commented out
+        // ============================================
+        
+        // Use mock data for user group
+        const mockUserData = {
+          id: "1",  // Mock user ID
+          group_id: "1"  // Mock group ID
+        }
+        
+        setUserGroupId(mockUserData.group_id)
+        setCurrentUserId(mockUserData.id)
+        console.log("📊 MOCK: Loaded user info - User ID:", mockUserData.id, "Group ID:", mockUserData.group_id)
+
+        /* ============================================
+        // ORIGINAL DATABASE CALL (COMMENTED OUT)
+        // ============================================
         // Fetch the user's profile from the database to get group_id
         const { data: userData, error: userError } = await supabase
           .from("User")
@@ -88,6 +105,7 @@ export function DashboardPage() {
           setCurrentUserId(userData.id)
           console.log("📊 Loaded user info - User ID:", userData.id, "Group ID:", userData.group_id)
         }
+        ============================================ */
       } catch (err) {
         console.error("Error loading user info:", err)
       }

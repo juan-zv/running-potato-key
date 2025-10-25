@@ -10,8 +10,15 @@
  */
 
 import { useState, useEffect, useCallback } from "react"
-import supabase from "@/utils/supabase"
+// import supabase from "@/utils/supabase"  // Commented out - using mock data
 import type { User, Group, Image, Task, AssignedTask } from "@/components/db/schema"
+import { 
+  mockGroup, 
+  mockUsers, 
+  mockImages, 
+  mockTasks, 
+  mockAssignedTasks 
+} from "@/utils/mockData"
 
 // Enhanced types with relationships
 interface TaskWithAssignees extends Task {
@@ -105,6 +112,26 @@ export function useGroupData(groupId: string | null): UseGroupDataReturn {
     }
 
     try {
+      // ============================================
+      // USING MOCK DATA - Database calls commented out
+      // ============================================
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      console.log("📊 Using MOCK DATA for group", groupId)
+
+      // Use mock data instead of database calls
+      const groupData = mockGroup
+      const usersData = mockUsers
+      const imagesData = mockImages
+      const tasksData = mockTasks
+      const assignedTasksData = mockAssignedTasks
+
+      /* ============================================
+      // ORIGINAL DATABASE CALLS (COMMENTED OUT)
+      // ============================================
+      
       // 1. Fetch group info
       const { data: groupData, error: groupError } = await supabase
         .from("Group")
@@ -125,10 +152,6 @@ export function useGroupData(groupId: string | null): UseGroupDataReturn {
 
       console.log("📊 Fetched users for group", groupId, ":", usersData)
 
-      // Create a map of user_id -> User for quick lookups
-      const userMap = new Map<string, User>()
-      usersData?.forEach(user => userMap.set(user.id, user))
-
       // 3. Fetch images with creator relationship
       const { data: imagesData, error: imagesError } = await supabase
         .from("Image")
@@ -137,12 +160,6 @@ export function useGroupData(groupId: string | null): UseGroupDataReturn {
         .order("created_at", { ascending: false })
 
       if (imagesError) throw imagesError
-
-      // Enrich images with creator info
-      const imagesWithCreator: ImageWithCreator[] = (imagesData || []).map(image => ({
-        ...image,
-        creator: userMap.get(image.user_id) || null,
-      }))
 
       // 4. Fetch tasks for this group
       const { data: tasksData, error: tasksError } = await supabase
@@ -169,6 +186,17 @@ export function useGroupData(groupId: string | null): UseGroupDataReturn {
           assignedTasksData = assignedData || []
         }
       }
+      ============================================ */
+
+      // Create a map of user_id -> User for quick lookups
+      const userMap = new Map<string, User>()
+      usersData?.forEach(user => userMap.set(user.id, user))
+
+      // Enrich images with creator info
+      const imagesWithCreator: ImageWithCreator[] = (imagesData || []).map(image => ({
+        ...image,
+        creator: userMap.get(image.user_id) || null,
+      }))
 
       // Create a map of task_id -> assigned user_ids
       const taskAssignmentsMap = new Map<string, string[]>()
@@ -231,12 +259,25 @@ export function useGroupData(groupId: string | null): UseGroupDataReturn {
   // Update task (for marking as completed)
   const updateTask = useCallback(async (taskId: string, updates: Partial<Task>) => {
     try {
+      // ============================================
+      // USING MOCK DATA - Database call commented out
+      // ============================================
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      console.log("📊 MOCK: Updating task", taskId, "with", updates)
+
+      /* ============================================
+      // ORIGINAL DATABASE CALL (COMMENTED OUT)
+      // ============================================
       const { error: updateError } = await supabase
         .from("Task")
         .update(updates)
         .eq("id", taskId)
 
       if (updateError) throw updateError
+      ============================================ */
 
       // Update local state immediately (optimistic update)
       setData(prev => ({
