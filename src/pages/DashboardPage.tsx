@@ -54,7 +54,7 @@ export function DashboardPage() {
       try {
         // Fetch the user's profile from the database to get group_id
         const { data: userData, error: userError } = await supabase
-          .from("users")
+          .from("User")
           .select("id, group_id")
           .eq("email", user.email)
           .single()
