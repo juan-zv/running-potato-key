@@ -76,7 +76,7 @@ export function GalleryCard({ images, loading, onImageUploaded, groupId, userId 
 
     if (!groupId || !userId) {
       toast.error("Unable to upload", {
-        description: "Group or user information is missing",
+        description: "Groupor user information is missing",
       })
       return
     }
