@@ -28,6 +28,7 @@ import {
 import { Images, Upload, Plus } from "lucide-react"
 import supabase from "@/utils/supabase"
 import { useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
 
 
@@ -71,6 +72,7 @@ export function GalleryCard() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [category, setCategory] = useState("family")
   const [uploading, setUploading] = useState(false)
+  const { user } = useAuth()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -102,9 +104,12 @@ export function GalleryCard() {
     }
 
     try {
-      setUploading(true)
-      const filename = `${Date.now()}-${selectedFile.name}`
-      const filepath = `${category}/${filename}`
+  setUploading(true)
+  const filename = `${Date.now()}-${selectedFile.name}`
+  // Prefix filepath with the current user's group_id. If not available, use 'nogroup' as fallback.
+  // Assumption: group_id is stored on the Supabase user metadata as user.user_metadata.group_id
+  const groupId = String(user?.user_metadata?.group_id ?? 'nogroup')
+  const filepath = `${groupId}/${category}/${filename}`
       
       const { error } = await supabase.storage
         .from("Images")
