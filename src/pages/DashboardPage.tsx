@@ -42,7 +42,6 @@ export function DashboardPage() {
     users, 
     images, 
     tasks, 
-    assignedTasks,
     fullData,
     loading, 
     error, 

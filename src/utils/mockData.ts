@@ -92,8 +92,7 @@ export const mockImages: Image[] = [
     title: "Mountain View",
     category: "travel",
     group_id: 1,
-    created_by: 1,
-    created_at: new Date("2025-01-15"),
+    user_id: 1,
   },
   {
     id: 2,
@@ -101,8 +100,7 @@ export const mockImages: Image[] = [
     title: "Nature Scene",
     category: "nature",
     group_id: 1,
-    created_by: 2,
-    created_at: new Date("2025-01-18"),
+    user_id: 2,
   },
   {
     id: 3,
@@ -110,8 +108,7 @@ export const mockImages: Image[] = [
     title: "Sunset Beach",
     category: "travel",
     group_id: 1,
-    created_by: 3,
-    created_at: new Date("2025-01-20"),
+    user_id: 3,
   },
   {
     id: 4,
@@ -119,8 +116,7 @@ export const mockImages: Image[] = [
     title: "Forest Path",
     category: "nature",
     group_id: 1,
-    created_by: 1,
-    created_at: new Date("2025-01-22"),
+    user_id: 1,
   },
   {
     id: 5,
@@ -128,8 +124,7 @@ export const mockImages: Image[] = [
     title: "Breakfast Together",
     category: "family",
     group_id: 1,
-    created_by: 5,
-    created_at: new Date("2025-01-25"),
+    user_id: 5,
   },
   {
     id: 6,
@@ -137,8 +132,7 @@ export const mockImages: Image[] = [
     title: "Game Night",
     category: "family",
     group_id: 1,
-    created_by: 4,
-    created_at: new Date("2025-02-01"),
+    user_id: 4,
   },
 ]
 

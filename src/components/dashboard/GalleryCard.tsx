@@ -110,7 +110,7 @@ export function GalleryCard({ images, loading, onImageUploaded, groupId, userId 
           title: selectedFile.name.replace(/\.[^/.]+$/, ""), // Remove extension
           category: category,
           group_id: groupId,
-          created_by: userId,
+          user_id: userId,
         })
 
       if (dbError) {

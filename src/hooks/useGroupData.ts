@@ -141,7 +141,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
       // Enrich images with creator info
       const imagesWithCreator: ImageWithCreator[] = (imagesData || []).map(image => ({
         ...image,
-        creator: userMap.get(image.created_by) || null,
+        creator: userMap.get(image.user_id) || null,
       }))
 
       // 4. Fetch tasks for this group

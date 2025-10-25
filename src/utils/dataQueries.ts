@@ -37,7 +37,7 @@ export function getTasksByUser(data: GroupDataStructure, userId: number): TaskWi
  */
 export function getImagesByCreator(data: GroupDataStructure, userId: number): ImageWithCreator[] {
   return data.images.filter(image => 
-    image.created_by === userId
+    image.user_id === userId
   )
 }
 
@@ -148,10 +148,10 @@ export function groupImagesByCreator(data: GroupDataStructure): Record<number, I
   const grouped: Record<number, ImageWithCreator[]> = {}
   
   data.images.forEach(image => {
-    if (!grouped[image.created_by]) {
-      grouped[image.created_by] = []
+    if (!grouped[image.user_id]) {
+      grouped[image.user_id] = []
     }
-    grouped[image.created_by].push(image)
+    grouped[image.user_id].push(image)
   })
   
   return grouped
