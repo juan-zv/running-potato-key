@@ -5,7 +5,9 @@ import { AISummaryCard } from "@/components/dashboard/AISummaryCard"
 import { TasksCard } from "@/components/dashboard/TasksCard"
 import { ContactsCard } from "@/components/dashboard/ContactsCard"
 import { GalleryCard } from "@/components/dashboard/GalleryCard"
+import { StudyMode } from "@/components/dashboard/StudyMode"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -19,12 +21,13 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import supabase from "@/utils/supabase"
 import { toast } from "sonner"
-import { LogOut, Settings, User as UserIcon, Bell, HelpCircle } from "lucide-react"
+import { LogOut, Settings, User as UserIcon, Bell, HelpCircle, GraduationCap } from "lucide-react"
 import { useState } from "react"
 
 export function DashboardPage() {
   const { user } = useAuth()
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [studyModeActive, setStudyModeActive] = useState(false)
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut()
@@ -35,6 +38,22 @@ export function DashboardPage() {
     } else {
       setSheetOpen(false)
     }
+  }
+
+  const handleStartStudyMode = () => {
+    setStudyModeActive(true)
+    toast.success("Study Mode Activated", {
+      description: "Everyone in your household has been notified that you've started studying.",
+      duration: 4000,
+    })
+  }
+
+  const handleExitStudyMode = () => {
+    setStudyModeActive(false)
+    toast.info("Study Session Complete", {
+      description: "Everyone in your household has been notified that you've finished studying.",
+      duration: 4000,
+    })
   }
 
   return (
@@ -62,8 +81,9 @@ export function DashboardPage() {
                         <p className="text-sm font-semibold">
                           {user?.user_metadata?.full_name || user?.email}
                         </p>
-                        <Badge variant="secondary" className="text-xs">Pro</Badge>
-                        <Badge variant="outline" className="text-xs">Premium</Badge>
+                        <Badge variant="secondary" className="text-xs">Clean</Badge>
+                        <Badge variant="outline" className="text-xs">Responsible</Badge>
+                        <Badge variant="default" className="text-xs">Best Roommate</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">
                         {user?.email}
@@ -71,7 +91,7 @@ export function DashboardPage() {
                     </div>
                   </button>
                 </SheetTrigger>
-                <SheetContent>
+                <SheetContent side="left">
                   <SheetHeader>
                     <SheetTitle>Account</SheetTitle>
                     <SheetDescription>
@@ -98,8 +118,8 @@ export function DashboardPage() {
                           {user?.email}
                         </p>
                         <div className="mt-2 flex gap-2">
-                          <Badge variant="secondary">Pro</Badge>
-                          <Badge variant="outline">Premium</Badge>
+                          <Badge variant="secondary">Clean</Badge>
+                          <Badge variant="outline">Responsible</Badge>
                         </div>
                       </div>
                     </div>
@@ -156,13 +176,13 @@ export function DashboardPage() {
                       </Button>
                     </div>
 
-                    <div className="border-t pt-4">
+                    <div className="border-t pt-4 mx-auto w-fit">
                       <Button
                         onClick={handleSignOut}
                         variant="destructive"
-                        className="w-full"
+                        className="w-fit mx-auto"
                       >
-                        <LogOut className="mr-2 h-4 w-4" />
+                        <LogOut className="mr-1 h-4 w-4" />
                         Sign Out
                       </Button>
                     </div>
@@ -172,7 +192,9 @@ export function DashboardPage() {
             </div>
 
             {/* Right side - Theme Toggle */}
-            <ModeToggle />
+            <div className="flex items-center gap-3">
+              <ModeToggle />
+            </div>
           </div>
         </header>
 
@@ -191,6 +213,33 @@ export function DashboardPage() {
 
             {/* AI Summary - Full Width */}
             <AISummaryCard />
+
+            {/* Study Mode Card */}
+            <Card className="w-full border-primary/30 bg-linear-to-r from-primary/10 to-purple-500/10">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+                      <GraduationCap className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Study Mode</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Focus for 60 minutes with 5 minute breaks
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleStartStudyMode}
+                    size="lg"
+                    className="gap-2"
+                  >
+                    <GraduationCap className="h-5 w-5" />
+                    Start Studying
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Grid Layout with Variant Widths */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -216,6 +265,11 @@ export function DashboardPage() {
             </div>
           </div>
         </main>
+
+        {/* Study Mode Overlay */}
+        {studyModeActive && (
+          <StudyMode onExit={handleExitStudyMode} />
+        )}
       </div>
     </ThemeProvider>
   )

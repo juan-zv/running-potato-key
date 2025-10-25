@@ -117,4 +117,8 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  .progress-bar {
+    width: var(--progress-width, 0%);
+  }
 }
