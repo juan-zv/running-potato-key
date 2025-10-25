@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider"
 import { ModeToggle } from "@/components/mode-toggle"
-import { CalendarEventsCard } from "@/components/auth/CalendarEventsCard"
+import { CalendarEventsCard } from "@/components/dashboard/CalendarEventsCard"
 import { AISummaryCard } from "@/components/dashboard/AISummaryCard"
 import { TasksCard } from "@/components/dashboard/TasksCard"
 import { ContactsCard } from "@/components/dashboard/ContactsCard"

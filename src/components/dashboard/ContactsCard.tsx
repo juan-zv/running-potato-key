@@ -49,7 +49,7 @@ const mockContacts: Contact[] = [
 
 export function ContactsCard() {
   return (
-    <Card className="w-full">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Contacts</CardTitle>
         <CardDescription>Your key contacts</CardDescription>

@@ -47,7 +47,7 @@ export function CalendarEventsCard() {
   }
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="h-5 w-5" />
@@ -79,7 +79,7 @@ export function CalendarEventsCard() {
         {events.length > 0 && (
           <div className="space-y-3 mt-4">
             <h3 className="text-sm font-semibold mb-4">Upcoming Events:</h3>
-            <ScrollArea className="h-[600px] rounded-md border">
+            <ScrollArea className="h-[400px] rounded-md border">
               <div className="p-4 space-y-3">
                 {events.map((event) => (
                   <div
