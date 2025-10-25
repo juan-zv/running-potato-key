@@ -84,7 +84,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
     try {
       // Fetch group info
       const { data: groupData, error: groupError } = await supabase
-        .from("groups")
+        .from("Group")
         .select("*")
         .eq("id", groupId)
         .single()
@@ -93,7 +93,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       // Fetch users in this group
       const { data: usersData, error: usersError } = await supabase
-        .from("users")
+        .from("User")
         .select("*")
         .eq("group_id", groupId)
         .order("name", { ascending: true })
@@ -102,7 +102,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       // Fetch images for this group
       const { data: imagesData, error: imagesError } = await supabase
-        .from("images")
+        .from("Image")
         .select("*")
         .eq("group_id", groupId)
         .order("created_at", { ascending: false })
@@ -111,7 +111,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
 
       // Fetch tasks for this group
       const { data: tasksData, error: tasksError } = await supabase
-        .from("tasks")
+        .from("Task")
         .select("*")
         .eq("group_id", groupId)
         .order("due_date", { ascending: true })
@@ -157,7 +157,7 @@ export function useGroupData(groupId: number | null): UseGroupDataReturn {
   const updateTask = useCallback(async (taskId: number, updates: Partial<Task>) => {
     try {
       const { error: updateError } = await supabase
-        .from("tasks")
+        .from("Task")
         .update(updates)
         .eq("id", taskId)
 
