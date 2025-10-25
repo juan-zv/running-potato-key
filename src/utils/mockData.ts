@@ -29,6 +29,7 @@ export const mockUsers: User[] = [
     special_needs: "",
     pets: "Cat named Whiskers",
     group_id: "1",
+    profile_picture: null,
   },
   {
     id: "2",
@@ -42,6 +43,7 @@ export const mockUsers: User[] = [
     special_needs: "",
     pets: "",
     group_id: "1",
+    profile_picture: null,
   },
   {
     id: "3",
@@ -55,6 +57,7 @@ export const mockUsers: User[] = [
     special_needs: "",
     pets: "Golden Retriever named Max",
     group_id: "1",
+    profile_picture: null,
   },
   {
     id: "4",
@@ -68,6 +71,7 @@ export const mockUsers: User[] = [
     special_needs: "",
     pets: "",
     group_id: "1",
+    profile_picture: null,
   },
   {
     id: "5",
@@ -81,6 +85,7 @@ export const mockUsers: User[] = [
     special_needs: "",
     pets: "Two goldfish",
     group_id: "1",
+    profile_picture: null,
   },
 ]
 
