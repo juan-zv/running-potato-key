@@ -29,9 +29,10 @@ export function SignInCard() {
     try {
       setLoading(true)
       
-      // Use environment variable for site URL, fallback to current origin
-      const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin
-      const redirectUrl = `${siteUrl}${import.meta.env.BASE_URL || '/'}`
+      // Use environment variable for site URL, or construct from current location
+      const redirectUrl = import.meta.env.VITE_SITE_URL 
+        ? import.meta.env.VITE_SITE_URL 
+        : `${window.location.origin}${import.meta.env.BASE_URL || '/'}`
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
