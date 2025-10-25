@@ -82,7 +82,6 @@ export function DashboardPage() {
                           {user?.user_metadata?.full_name || user?.email}
                         </p>
                         <Badge variant="secondary" className="text-xs">Clean</Badge>
-                        <Badge variant="outline" className="text-xs">Responsible</Badge>
                         <Badge variant="default" className="text-xs">Best Roommate</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">
@@ -119,7 +118,7 @@ export function DashboardPage() {
                         </p>
                         <div className="mt-2 flex gap-2">
                           <Badge variant="secondary">Clean</Badge>
-                          <Badge variant="outline">Responsible</Badge>
+                          <Badge variant="default">Best Roommate</Badge>
                         </div>
                       </div>
                     </div>
