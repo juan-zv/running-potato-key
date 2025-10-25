@@ -88,7 +88,7 @@ export const mockUsers: User[] = [
 export const mockImages: Image[] = [
   {
     id: 1,
-    url: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=400&h=300&fit=crop",
+    url: "https://placehold.co/600x400",
     title: "Mountain View",
     category: "travel",
     group_id: 1,
@@ -97,7 +97,7 @@ export const mockImages: Image[] = [
   },
   {
     id: 2,
-    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
+    url: "https://placehold.co/600x400",
     title: "Nature Scene",
     category: "nature",
     group_id: 1,
@@ -106,7 +106,7 @@ export const mockImages: Image[] = [
   },
   {
     id: 3,
-    url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop",
+    url: "https://placehold.co/600x400",
     title: "Sunset Beach",
     category: "travel",
     group_id: 1,
