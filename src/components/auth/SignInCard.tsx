@@ -28,10 +28,15 @@ export function SignInCard() {
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true)
+      
+      // Use environment variable for site URL, fallback to current origin
+      const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+      const redirectUrl = `${siteUrl}${import.meta.env.BASE_URL || '/'}`
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: redirectUrl,
           scopes: "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events.readonly",
           queryParams: {
             access_type: "offline",
