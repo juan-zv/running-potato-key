@@ -19,15 +19,65 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { useAuth } from "@/hooks/useAuth"
+import { useGroupData } from "@/hooks/useGroupData"
 import supabase from "@/utils/supabase"
 import { toast } from "sonner"
-import { LogOut, Settings, User as UserIcon, Bell, HelpCircle, GraduationCap } from "lucide-react"
-import { useState } from "react"
+import { LogOut, Settings, User as UserIcon, Bell, HelpCircle, GraduationCap, RefreshCw } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export function DashboardPage() {
   const { user } = useAuth()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [studyModeActive, setStudyModeActive] = useState(false)
+  
+  // Get user's group_id from user metadata or profile
+  const [userGroupId, setUserGroupId] = useState<number | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+
+  // Fetch group data with auto-refresh
+  const { 
+    group, 
+    users, 
+    images, 
+    tasks, 
+    loading, 
+    error, 
+    refetch, 
+    updateTask 
+  } = useGroupData(userGroupId)
+
+  // Load user's group_id and database user_id on mount
+  useEffect(() => {
+    async function loadUserInfo() {
+      if (!user) return
+
+      try {
+        // Fetch the user's profile from the database to get group_id
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("id, group_id")
+          .eq("email", user.email)
+          .single()
+
+        if (userError) {
+          console.error("Error fetching user profile:", userError)
+          toast.error("Failed to load user profile", {
+            description: "Please make sure your profile is set up in the database",
+          })
+          return
+        }
+
+        if (userData) {
+          setUserGroupId(userData.group_id)
+          setCurrentUserId(userData.id)
+        }
+      } catch (err) {
+        console.error("Error loading user info:", err)
+      }
+    }
+
+    loadUserInfo()
+  }, [user])
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut()
@@ -206,7 +256,11 @@ export function DashboardPage() {
                 Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'there'}! 👋
               </h1>
               <p className="text-muted-foreground">
-                Here's what's happening with your schedule today.
+                {group ? (
+                  `${group.building} - Apartment ${group.apt_num} • ${users.length} roommate${users.length !== 1 ? 's' : ''}`
+                ) : (
+                  "Here's what's happening with your schedule today."
+                )}
               </p>
             </div>
 
@@ -249,19 +303,50 @@ export function DashboardPage() {
 
               {/* Tasks - 1 column */}
               <div className="lg:col-span-1">
-                <TasksCard />
+                <TasksCard 
+                  tasks={tasks} 
+                  loading={loading} 
+                  onTaskUpdate={updateTask}
+                />
               </div>
 
               {/* Contacts - 1 column */}
               <div className="lg:col-span-1">
-                <ContactsCard />
+                <ContactsCard 
+                  users={users} 
+                  loading={loading}
+                />
               </div>
 
               {/* Gallery - Spans 2 columns on large screens */}
               <div className="lg:col-span-2">
-                <GalleryCard />
+                <GalleryCard 
+                  images={images} 
+                  loading={loading}
+                  onImageUploaded={refetch}
+                  groupId={userGroupId}
+                  userId={currentUserId}
+                />
               </div>
             </div>
+
+            {/* Error display */}
+            {error && (
+              <div className="mt-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+                <p className="text-sm text-destructive">
+                  <strong>Error loading data:</strong> {error}
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={refetch}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Try Again
+                </Button>
+              </div>
+            )}
           </div>
         </main>
 

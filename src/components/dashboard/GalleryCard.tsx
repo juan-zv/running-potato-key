@@ -25,21 +25,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Images, Upload, Plus } from "lucide-react"
+import { Images, Upload, Plus, Loader2 } from "lucide-react"
 import supabase from "@/utils/supabase"
 import { useState } from "react"
-import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
-import { mockImages } from "@/utils/mockData"
 import type { Image } from "@/components/db/schema"
 
-export function GalleryCard() {
-  const [images] = useState<Image[]>(mockImages)
+interface GalleryCardProps {
+  images: Image[]
+  loading: boolean
+  onImageUploaded: () => void
+  groupId: number | null
+  userId: number | null
+}
+
+export function GalleryCard({ images, loading, onImageUploaded, groupId, userId }: GalleryCardProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [category, setCategory] = useState("family")
   const [uploading, setUploading] = useState(false)
-  const { user } = useAuth()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -70,32 +74,65 @@ export function GalleryCard() {
       return
     }
 
+    if (!groupId || !userId) {
+      toast.error("Unable to upload", {
+        description: "Group or user information is missing",
+      })
+      return
+    }
+
     try {
-  setUploading(true)
-  const filename = `${Date.now()}-${selectedFile.name}`
-  // Prefix filepath with the current user's group_id. If not available, use 'nogroup' as fallback.
-  // Assumption: group_id is stored on the Supabase user metadata as user.user_metadata.group_id
-  const groupId = String(user?.user_metadata?.group_id ?? 'nogroup')
-  const filepath = `${groupId}/${category}/${filename}`
+      setUploading(true)
+      const filename = `${Date.now()}-${selectedFile.name}`
+      const filepath = `${groupId}/${category}/${filename}`
       
-      const { error } = await supabase.storage
+      const { error: storageError } = await supabase.storage
         .from("Images")
         .upload(filepath, selectedFile)
 
-      if (error) {
+      if (storageError) {
         toast.error("Upload failed", {
-          description: error.message,
+          description: storageError.message,
         })
-      } else {
-        toast.success("Image uploaded successfully!", {
-          description: `Your image has been added to the ${category} category`,
-        })
-        setSheetOpen(false)
-        setSelectedFile(null)
-        // Reset file input
-        const fileInput = document.getElementById('picture') as HTMLInputElement
-        if (fileInput) fileInput.value = ''
+        return
       }
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from("Images")
+        .getPublicUrl(filepath)
+
+      // Insert metadata into database
+      const { error: dbError } = await supabase
+        .from("images")
+        .insert({
+          url: urlData.publicUrl,
+          title: selectedFile.name.replace(/\.[^/.]+$/, ""), // Remove extension
+          category: category,
+          group_id: groupId,
+          created_by: userId,
+        })
+
+      if (dbError) {
+        toast.error("Failed to save image info", {
+          description: dbError.message,
+        })
+        return
+      }
+
+      toast.success("Image uploaded successfully!", {
+        description: `Your image has been added to the ${category} category`,
+      })
+      
+      setSheetOpen(false)
+      setSelectedFile(null)
+      
+      // Reset file input
+      const fileInput = document.getElementById('picture') as HTMLInputElement
+      if (fileInput) fileInput.value = ''
+      
+      // Refresh the gallery
+      onImageUploaded()
     } catch (error) {
       toast.error("An error occurred", {
         description: error instanceof Error ? error.message : "Unknown error",
@@ -210,7 +247,11 @@ export function GalleryCard() {
         </div>
       </CardHeader>
       <CardContent>
-        {images.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : images.length > 0 ? (
           <Carousel className="w-full">
             <CarouselContent>
               {images.map((image) => (
