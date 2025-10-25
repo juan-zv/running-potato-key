@@ -42,11 +42,21 @@ export function DashboardPage() {
     users, 
     images, 
     tasks, 
+    assignedTasks,
+    fullData,
     loading, 
     error, 
     refetch, 
     updateTask 
   } = useGroupData(userGroupId)
+
+  // Log the complete structured JSON data for debugging
+  useEffect(() => {
+    if (!loading && fullData) {
+      console.log("📊 Complete Group Data (JSON Structure):", JSON.stringify(fullData, null, 2))
+      console.log("📊 Full Data Object:", fullData)
+    }
+  }, [fullData, loading])
 
   // Callback to receive calendar events from CalendarEventsCard
   const handleCalendarEventsLoaded = (events: CalendarEvent[]) => {
@@ -77,6 +87,7 @@ export function DashboardPage() {
         if (userData) {
           setUserGroupId(userData.group_id)
           setCurrentUserId(userData.id)
+          console.log("📊 Loaded user info - User ID:", userData.id, "Group ID:", userData.group_id)
         }
       } catch (err) {
         console.error("Error loading user info:", err)

@@ -104,7 +104,7 @@ export function GalleryCard({ images, loading, onImageUploaded, groupId, userId 
 
       // Insert metadata into database
       const { error: dbError } = await supabase
-        .from("images")
+        .from("Image")
         .insert({
           url: urlData.publicUrl,
           title: selectedFile.name.replace(/\.[^/.]+$/, ""), // Remove extension
