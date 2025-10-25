@@ -43,3 +43,8 @@ Stack used:
     ```
 
 3. Open your browser and navigate to `http://localhost:5173` to view the application.
+
+## Environment Variables
+Create a `.env.local` file in the root directory of the project based on the `.env.local.example` file. Make sure to set the following variables:
+- `VITE_SUPABASE_URL`: Your Supabase project URL.
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anon key.
