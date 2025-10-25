@@ -112,6 +112,7 @@ export function StudyMode({ onExit }: StudyModeProps) {
             style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
           />
           
+          
           <div className="p-12">
             <div className="text-center">
               <div className="text-9xl font-bold tabular-nums tracking-tight mb-4">
