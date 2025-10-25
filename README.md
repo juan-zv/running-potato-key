@@ -2,7 +2,7 @@
 
 ## Team Members
 - Juan Zurita
-- Esther 
+- Esther Scott
 - Efrain Gomez
 - David Martinez
 

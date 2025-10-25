@@ -1,10 +1,22 @@
-import { Button } from "@/components/ui/button"
+import { ThemeProvider } from "@/components/theme-provider"
+import { ModeToggle } from "@/components/mode-toggle"
+import { Toaster } from "@/components/ui/sonner"
+import { SignInCard } from "@/components/auth/SignInCard"
+import { CalendarEventsCard } from "@/components/auth/CalendarEventsCard"
+
 
 function App() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center">
-      <Button>Click me</Button>
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-6">
+        <div className="absolute top-4 right-4">
+          <ModeToggle />
+        </div>
+        <SignInCard />
+        <CalendarEventsCard />
+      </div>
+      <Toaster />
+    </ThemeProvider>
   )
 }
 
