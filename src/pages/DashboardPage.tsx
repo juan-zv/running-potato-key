@@ -24,13 +24,16 @@ import supabase from "@/utils/supabase"
 import { toast } from "sonner"
 import { LogOut, Settings, User as UserIcon, Bell, HelpCircle, GraduationCap, RefreshCw } from "lucide-react"
 import { useState, useEffect } from "react"
-import type { CalendarEvent } from "@/utils/calendar"
+
+// Will need to import calendar events hook when AISummaryCard is re-enabled
+// import { useCalendarEvents } from "@/hooks/useCalendarEvents"
+// and handle its state
+// const { calendarEvents, loading: calendarLoading } = useCalendarEvents()
 
 export function DashboardPage() {
   const { user } = useAuth()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [studyModeActive, setStudyModeActive] = useState(false)
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
   
   // Get user's group_id from user metadata or profile
   const [userGroupId, setUserGroupId] = useState<string | null>(null)
@@ -56,11 +59,6 @@ export function DashboardPage() {
       console.log("📊 Full Data Object:", fullData)
     }
   }, [fullData, loading])
-
-  // Callback to receive calendar events from CalendarEventsCard
-  const handleCalendarEventsLoaded = (events: CalendarEvent[]) => {
-    setCalendarEvents(events)
-  }
 
   // Load user's group_id and database user_id on mount
   useEffect(() => {
@@ -336,7 +334,7 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Calendar Events - Spans 2 columns on large screens */}
               <div className="lg:col-span-2">
-                <CalendarEventsCard onEventsLoaded={handleCalendarEventsLoaded} />
+                <CalendarEventsCard />
               </div>
 
               {/* Tasks - 1 column */}
