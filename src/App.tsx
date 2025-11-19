@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { LoginPage } from "@/pages/LoginPage"
 import { DashboardPage } from "@/pages/DashboardPage"
+import { ResetPasswordPage } from "@/pages/ResetPasswordPage"
 import { useAuth } from "@/hooks/useAuth"
 import { Progress } from "@/components/ui/progress"
 import { useState, useEffect } from "react"
@@ -9,6 +10,10 @@ import { useState, useEffect } from "react"
 function App() {
   const { user, loading } = useAuth()
   const [progress, setProgress] = useState(0)
+  
+  // Check if we're on the reset password page
+  const isResetPasswordPage = window.location.pathname === '/reset-password' || 
+                               window.location.hash.includes('type=recovery')
 
   // Animate progress bar while loading
   useEffect(() => {
@@ -40,6 +45,16 @@ function App() {
         </div>
         <Toaster />
       </ThemeProvider>
+    )
+  }
+
+  // Show reset password page if user is on that route
+  if (isResetPasswordPage) {
+    return (
+      <>
+        <ResetPasswordPage />
+        <Toaster />
+      </>
     )
   }
 

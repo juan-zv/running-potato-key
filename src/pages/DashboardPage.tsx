@@ -1,7 +1,7 @@
 import { ThemeProvider } from "@/components/theme-provider"
 import { ModeToggle } from "@/components/mode-toggle"
 import { CalendarEventsCard } from "@/components/dashboard/CalendarEventsCard"
-import { AISummaryCard } from "@/components/dashboard/AISummaryCard"
+// import { AISummaryCard } from "@/components/dashboard/AISummaryCard"
 import { TasksCard } from "@/components/dashboard/TasksCard"
 import { ContactsCard } from "@/components/dashboard/ContactsCard"
 import { GalleryCard } from "@/components/dashboard/GalleryCard"
@@ -300,10 +300,10 @@ export function DashboardPage() {
             </div>
 
             {/* AI Summary - Full Width */}
-            <AISummaryCard 
+            {/*<AISummaryCard 
               tasks={tasks} 
               calendarEvents={calendarEvents}
-            />
+            />*/}
 
             {/* Study Mode Card */}
             <Card className="w-full border-primary/30 bg-linear-to-r from-primary/10 to-purple-500/10">
